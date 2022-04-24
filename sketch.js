@@ -334,6 +334,11 @@ function keyPressed() {
   if (keyCode == UP_ARROW) {
     player.velocityY = -10
     player.positionY -= 0.001
+    jump1sound.stop()
+    jump2sound.stop()
+
+    jump2sound.play()
+
   }
 
   // 32 is KeyCode for SpaceBar
@@ -367,11 +372,23 @@ var plattform5 = new Plattform(700, window.innerHeight - 130, 90, 90)
 
 
 var all_plattforms = [ground, plattform1, plattform2, plattform3, plattform4, plattform5]
+var ingame_song,jump1sound,jump2sound;
+
+function preload(){
+  ingame_song = loadSound("./sounds/Voxel Revolution.mp3")
+  jump1sound = loadSound("./sounds/jump1.wav")
+  jump1sound
+  
+  jump2sound = loadSound("./sounds/jump2.wav")
+
+
+}
+
 
 function setup() {
 
   createCanvas(window.innerWidth, window.innerHeight);
-
+  ingame_song.loop();
 }
 
 function drawBackground() {

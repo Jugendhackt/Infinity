@@ -25,7 +25,7 @@ function draw() {
 
   var coins = []
   for (var i = 0; i < 10; i++) {
-    coins.push(new Coin(10+20*i, 10, 10,"yellow"));
+    coins.push(new Coin(10+20*i, 100, 100,"yellow"));
   }
 
   coins.forEach(coin => {
