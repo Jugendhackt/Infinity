@@ -71,11 +71,12 @@ class BoundingBox {
 }
 
 class Plattform {
-  constructor(positionX, positionY, width, height) {
+  constructor(positionX, positionY, width, height, color="brown") {
     this.positionX = positionX
     this.positionY = positionY
     this.width = width
     this.height = height
+    this.color = color
 
     this.bbox = new BoundingBox(positionX, positionY, width, height)
 
@@ -86,7 +87,7 @@ class Plattform {
 
     strokeWeight(3)
     stroke("rgb(97,5,8)")
-    fill("brown")
+    fill(this.color)
     rect(this.positionX - diffX, this.positionY, this.width, this.height)
   }
 
@@ -226,11 +227,11 @@ class Player {
 
     var diffX = this.positionX - oldX
     this.screenX += diffX
-    if(this.screenX >= 0.9 * windowWidth) {
-      this.screenX = 0.9 * windowWidth
+    if(this.screenX >= 0.75 * windowWidth) {
+      this.screenX = 0.75 * windowWidth
     }
-    if(this.screenX <= 0.1 * windowWidth) {
-      this.screenX = 0.1 * windowWidth
+    if(this.screenX <= 0.25 * windowWidth) {
+      this.screenX = 0.25 * windowWidth
     }
   }
 
@@ -321,8 +322,8 @@ class Player {
   */
   draw() {
     rectMode(CENTER);
-    fill("rgb(19, 34, 194)")
-    stroke("rgb(14,21,115)")
+    fill("rgb(255, 94, 0)")
+    stroke("rgb(89,36,4)")
     strokeWeight(3)
     square(this.screenX, this.positionY, 50)
     strokeWeight(1)  
@@ -369,10 +370,10 @@ function keyReleased() {
 
 var movingClouds = 0
 var player = new Player(100, 100)
-var ground = new Plattform(0, window.innerHeight - 40, 20000, 90)
+var ground = new Plattform(0, window.innerHeight - 40, 20000, 90, "blue")
 var plattform1 = new Plattform(610, window.innerHeight - 130, 90, 90)
 var plattform2 = new Plattform(200, window.innerHeight - 220, 90, 90)
-var plattform3 = new Plattform(200, window.innerHeight - 310, 90, 90)
+var plattform3 = new Plattform(100, window.innerHeight - 310, 150, 90)
 var plattform4 = new Plattform(290, window.innerHeight - 220, 90, 90)
 var plattform5 = new Plattform(700, window.innerHeight - 130, 90, 90)
 var plattform6 = new Plattform(700, window.innerHeight - 330, 90, 90)
@@ -390,6 +391,14 @@ function preload(){
   ingame_song = loadSound("./sounds/Voxel Revolution.mp3")
   jump1sound = loadSound("./sounds/jump1.wav")
   jump2sound = loadSound("./sounds/jump2.wav")
+
+  for (var i=0; i < 200; i++) {
+    var x = 1400 + 200*i + 100*Math.random()
+    var y = 500 + 200*Math.random()
+    all_plattforms.push(new Plattform(x, window.innerHeight - y, 90, 90))
+    all_plattforms.push(new Plattform(x+ 50*Math.random(), window.innerHeight - y+250+50*Math.random(), 90, 90))
+
+  }
 }
 
 
