@@ -372,23 +372,24 @@ var player = new Player(100, 100)
 var ground = new Plattform(0, window.innerHeight - 40, 20000, 90)
 var plattform1 = new Plattform(610, window.innerHeight - 130, 90, 90)
 var plattform2 = new Plattform(200, window.innerHeight - 220, 90, 90)
-var plattform3 = new Plattform(200, window.innerHeight - 260, 90, 90)
-var plattform4 = new Plattform(290, window.innerHeight - 130, 90, 90)
+var plattform3 = new Plattform(200, window.innerHeight - 310, 90, 90)
+var plattform4 = new Plattform(290, window.innerHeight - 220, 90, 90)
 var plattform5 = new Plattform(700, window.innerHeight - 130, 90, 90)
-var plattform6 = new Plattform(700, window,innerHeight - 310, 90, 90)
+var plattform6 = new Plattform(700, window.innerHeight - 330, 90, 90)
+var plattform7 = new Plattform(1100, window.innerHeight - 330, 90, 90)
+var plattform8 = new Plattform(900, window.innerHeight - 550, 90, 90)
+var plattform9 = new Plattform(1250, window.innerHeight - 450, 90, 90)
+var plattform10 = new Plattform(290, window.innerHeight - 420, 90, 90)
 
 
-var all_plattforms = [ground, plattform1, plattform2, plattform3, plattform4, plattform5]
+var all_plattforms = [ground, plattform1, plattform2, plattform3, plattform4, plattform5, plattform6, plattform7, plattform8, plattform9, plattform10]
+
 var ingame_song,jump1sound,jump2sound;
 
 function preload(){
   ingame_song = loadSound("./sounds/Voxel Revolution.mp3")
   jump1sound = loadSound("./sounds/jump1.wav")
-  jump1sound
-  
   jump2sound = loadSound("./sounds/jump2.wav")
-
-
 }
 
 
