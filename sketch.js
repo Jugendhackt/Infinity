@@ -105,6 +105,8 @@ class Player {
     this.accelerationX = 0
     this.accelerationY = 0
 
+    this.ground = false 
+
     this.width = 50;
     this.height = 50;
 
@@ -121,6 +123,8 @@ class Player {
 
     let targetX = this.positionX + this.velocityX;
     let targetY = this.positionY + this.velocityY;
+
+    this.ground = false;
 
     for (let k = 0; k < 2; k++) {
       let stopX = false;
@@ -204,6 +208,7 @@ class Player {
         this.positionX = targetX;
       }
       else if (stopY) {
+        this.ground = true
         this.velocityY = 0;
         this.positionY = targetY;
       }
@@ -214,6 +219,7 @@ class Player {
         this.bbox.reposition(this.positionX, this.positionY)
         break;
       }
+
 
       this.bbox.reposition(this.positionX, this.positionY)
     }
@@ -331,7 +337,7 @@ function keyPressed() {
   if (keyCode == LEFT_ARROW) {
     player.accelerationX = -1
   }
-  if (keyCode == UP_ARROW) {
+  if (keyCode == UP_ARROW && player.ground) {
     player.velocityY = -10
     player.positionY -= 0.001
     jump1sound.stop()
@@ -366,9 +372,10 @@ var player = new Player(100, 100)
 var ground = new Plattform(0, window.innerHeight - 40, 20000, 90)
 var plattform1 = new Plattform(610, window.innerHeight - 130, 90, 90)
 var plattform2 = new Plattform(200, window.innerHeight - 220, 90, 90)
-var plattform3 = new Plattform(200, window.innerHeight - 310, 90, 90)
-var plattform4 = new Plattform(290, window.innerHeight - 220, 90, 90)
+var plattform3 = new Plattform(200, window.innerHeight - 260, 90, 90)
+var plattform4 = new Plattform(290, window.innerHeight - 130, 90, 90)
 var plattform5 = new Plattform(700, window.innerHeight - 130, 90, 90)
+var plattform6 = new Plattform(700, window,innerHeight - 310, 90, 90)
 
 
 var all_plattforms = [ground, plattform1, plattform2, plattform3, plattform4, plattform5]
