@@ -121,9 +121,9 @@ class Player {
   // Bewege dich nach rechts
 
   update() {
-    const oldX = this.positionX;
+    var oldX = this.positionX
 
-    this.velocityX += this.accelerationX - this.velocityX * air_resistance;
+    this.velocityX += this.accelerationX - this.velocityX * air_resisstance;
     this.velocityY += this.accelerationY + gravity;
 
     let targetX = this.positionX + this.velocityX;
@@ -132,79 +132,94 @@ class Player {
     this.ground = false;
 
     for (let k = 0; k < 2; k++) {
-        let stopX = false;
-        let stopY = false;
-        let nearest_collision = null;
+      let stopX = false;
+      let stopY = false;
 
-        for (const next_plattform of all_plattforms) {
-            for (let j = 0; j < 20; j++) {
-                let intersection;
-                if (j < 10) {
-                    intersection = next_plattform.bbox.cutsRay(
-                        this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2,
-                        this.positionY + Math.sign(this.velocityY) * this.height / 2,
-                        this.velocityX,
-                        this.velocityY
-                    );
-                } else {
-                    intersection = next_plattform.bbox.cutsRay(
-                        this.positionX + Math.sign(this.velocityX) * this.width / 2,
-                        this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
-                        this.velocityX,
-                        this.velocityY
-                    );
-                }
+      let nearest_collision = null
 
-                if (!intersection || intersection[0] > 1) continue;
+      for (let i = 0; i < all_plattforms.length; i++) {
+        let next_plattform = all_plattforms[i]
 
-                if (!nearest_collision || nearest_collision[0] > intersection[0]) {
-                    nearest_collision = intersection;
-                }
-            }
+        for (let j = 0; j < 20; j++) {
+          let intersection = next_plattform.bbox.cutsRay(
+            this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2,
+            this.positionY + Math.sign(this.velocityY) * this.height / 2,
+            this.velocityX,
+            this.velocityY
+          );
+
+          if (j >= 10) {
+            intersection = next_plattform.bbox.cutsRay(
+            this.positionX + Math.sign(this.velocityX) * this.width / 2,
+            this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
+            this.velocityX,
+            this.velocityY
+          );
+            
         }
 
-        if (nearest_collision) {
-            if (nearest_collision[2] === "X" && this.velocityX < 0) {
-                targetX = Math.max(targetX, nearest_collision[1][0] + this.width / 2 + 0.01);
-            }
-            if (nearest_collision[2] === "X" && this.velocityX > 0) {
-                targetX = Math.min(targetX, nearest_collision[1][0] - this.width / 2 - 0.01);
-            }
-            if (nearest_collision[2] === "Y" && this.velocityY < 0) {
-                targetY = Math.max(targetY, nearest_collision[1][1] + this.height / 2 + 0.01);
-            }
-            if (nearest_collision[2] === "Y" && this.velocityY > 0) {
-                targetY = Math.min(targetY, nearest_collision[1][1] - this.height / 2 - 0.01);
-            }
-            stopX = nearest_collision[2] === "X";
-            stopY = nearest_collision[2] === "Y";
+          if (!intersection || intersection[0] > 1) continue;
+
+          // Hier haben wir jetzt eine Intersection
+          // -> Uns interessiert nur die näheste Intersection
+          if (!nearest_collision || nearest_collision[0] > intersection[0]) {
+            nearest_collision = intersection;
+          }
+        }
+      }
+
+      if (nearest_collision) {
+        // Target Position updaten
+        if (nearest_collision[2] == "X"&& this.velocityX < 0) {
+          targetX = max(targetX, nearest_collision[1][0] + this.width / 2 + 0.01);
+        }
+        if (nearest_collision[2] == "X"&& this.velocityX > 0) {
+          targetX = min(targetX, nearest_collision[1][0] - this.width / 2 - 0.01);
         }
 
-        if (stopX) {
-            this.velocityX = 0;
-            this.positionX = targetX;
-        } else if (stopY) {
-            this.ground = true;
-            this.velocityY = 0;
-            this.positionY = targetY;
-        } else {
-            this.positionX = targetX;
-            this.positionY = targetY;
-            this.bbox.reposition(this.positionX, this.positionY);
-            break;
+        if (nearest_collision[2] == "Y"&& this.velocityY < 0) {
+          targetY = max(targetY, nearest_collision[1][1] + this.height / 2 + 0.01);
         }
-        this.bbox.reposition(this.positionX, this.positionY);
+        if (nearest_collision[2] == "Y"&& this.velocityY > 0) {
+          targetY = min(targetY, nearest_collision[1][1] - this.height / 2 - 0.01);
+        }
+
+        // Note which direction should be stoped
+        stopX = nearest_collision[2] == "X";
+        stopY = nearest_collision[2] == "Y";
+      }
+
+      if (stopX) {
+        this.velocityX = 0;
+        this.positionX = targetX;
+      }
+      else if (stopY) {
+        this.ground = true
+        this.velocityY = 0;
+        this.positionY = targetY;
+      }
+      else{
+        this.positionX = targetX;
+        this.positionY = targetY;
+
+        this.bbox.reposition(this.positionX, this.positionY)
+        break;
+      }
+
+
+      this.bbox.reposition(this.positionX, this.positionY)
     }
 
-    const diffX = this.positionX - oldX;
-    this.screenX += diffX;
-    if (this.screenX >= 0.75 * window.innerWidth) {
-        this.screenX = 0.75 * window.innerWidth;
+    var diffX = this.positionX - oldX
+    this.screenX += diffX
+    if(this.screenX >= 0.75 * windowWidth) {
+      this.screenX = 0.75 * windowWidth
     }
-    if (this.screenX <= 0.25 * window.innerWidth) {
-        this.screenX = 0.25 * window.innerWidth;
+    if(this.screenX <= 0.25 * windowWidth) {
+      this.screenX = 0.25 * windowWidth
     }
   }
+  
   draw() {
     rectMode(CENTER);
     fill("rgb(255, 94, 0)")
@@ -213,7 +228,6 @@ class Player {
     square(this.screenX, this.positionY, 50)
     strokeWeight(1)  
   }
-
 }
 
 function extendGround() {
@@ -315,12 +329,6 @@ function drawBackground() {
     circle(windowWidth / 10 * i - diffX, 0.92 * windowHeight, 0.25 * windowHeight)
   }
   strokeWeight(1)
-
-  // Dirt/Floor
-  /*fill("brown")
-  stroke("brown")
-  rectMode(CORNER)
-  rect(0, 0.925 * windowHeight, windowWidth, 0.075 * windowHeight)*/
 
   // Clouds
   fill("white")
