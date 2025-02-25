@@ -91,6 +91,10 @@ class Plattform {
     rect(this.positionX - diffX, this.positionY, this.width, this.height)
   }
 
+  resize(new_width, new_height) {  // Not final
+    this.width = new_width
+    this.height = new_height
+  }
 }
 class Player {
   // Wird beim Erstellen der Klasse aufgerufen
@@ -331,6 +335,13 @@ class Player {
 
 }
 
+function extendGround() {
+    let lastPlattform = all_plattforms[all_plattforms.length - 1];
+    let newX = lastPlattform.positionX + lastPlattform.width;
+    let newPlattform = new Plattform(newX, window.innerHeight - 40, 2000, 90, "blue");
+    all_plattforms.push(newPlattform);
+}
+
 function keyPressed() {
   if (keyCode == RIGHT_ARROW) {
     player.accelerationX = 1
@@ -338,7 +349,7 @@ function keyPressed() {
   if (keyCode == LEFT_ARROW) {
     player.accelerationX = -1
   }
-  if (keyCode == UP_ARROW && player.ground) {
+  if ((keyCode == UP_ARROW || keyCode == 32) && player.ground) {
     player.velocityY = -10
     player.positionY -= 0.001
     jump1sound.stop()
@@ -446,21 +457,20 @@ function drawBackground() {
     circle(windowWidth / 1.5 * (c+0.05) - diffX / 10 + noise(3*c) + movingClouds / 5, 0.15 * windowWidth + noise(12*c), 0.25 * windowHeight + noise(4*c))
     circle(windowWidth / 1.5 * (c+0.1) - diffX / 10 + noise(5*c) + movingClouds / 5, 0.1 * windowWidth + noise(13*c), 0.25 * windowHeight + noise(6*c))
   }
-   
-
 }
-
 
 function draw() {
-  //background("grey");
-  drawBackground()
-  player.draw()
-  for (let i = 0; i < all_plattforms.length; i++) {
-    const element = all_plattforms[i];
-    element.draw()
-  }
+    drawBackground();
+    player.draw();
+    for (let i = 0; i < all_plattforms.length; i++) {
+        const element = all_plattforms[i];
+        element.draw();
+    }
+    player.update();
 
-  player.update()
-
+    // Überprüfen, ob der Spieler in der Nähe des Endes des Bodens ist
+    let lastPlattform = all_plattforms[all_plattforms.length - 1];
+    if (player.positionX + player.width / 2 > lastPlattform.positionX + lastPlattform.width - 100) {
+        extendGround();
+    }
 }
-
