@@ -121,9 +121,9 @@ class Player {
   // Bewege dich nach rechts
 
   update() {
-    var oldX = this.positionX
+    const oldX = this.positionX;
 
-    this.velocityX += this.accelerationX - this.velocityX * air_resisstance;
+    this.velocityX += this.accelerationX - this.velocityX * air_resistance;
     this.velocityY += this.accelerationY + gravity;
 
     let targetX = this.positionX + this.velocityX;
@@ -132,198 +132,79 @@ class Player {
     this.ground = false;
 
     for (let k = 0; k < 2; k++) {
-      let stopX = false;
-      let stopY = false;
+        let stopX = false;
+        let stopY = false;
+        let nearest_collision = null;
 
-      let nearest_collision = null
+        for (const next_plattform of all_plattforms) {
+            for (let j = 0; j < 20; j++) {
+                let intersection;
+                if (j < 10) {
+                    intersection = next_plattform.bbox.cutsRay(
+                        this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2,
+                        this.positionY + Math.sign(this.velocityY) * this.height / 2,
+                        this.velocityX,
+                        this.velocityY
+                    );
+                } else {
+                    intersection = next_plattform.bbox.cutsRay(
+                        this.positionX + Math.sign(this.velocityX) * this.width / 2,
+                        this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
+                        this.velocityX,
+                        this.velocityY
+                    );
+                }
 
-      for (let i = 0; i < all_plattforms.length; i++) {
-        let next_plattform = all_plattforms[i]
+                if (!intersection || intersection[0] > 1) continue;
 
-        for (let j = 0; j < 20; j++) {
-          let intersection = next_plattform.bbox.cutsRay(
-            this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2,
-            this.positionY + Math.sign(this.velocityY) * this.height / 2,
-            this.velocityX,
-            this.velocityY
-          );
-
-          /*line(this.screenX + (1 - 2 * (j % 10) / 9) * this.width / 2,
-          this.positionY + Math.sign(this.velocityY) * this.height / 2,
-          this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2+this.velocityX,
-          this.positionY + Math.sign(this.velocityY) * this.height / 2+this.velocityY)*/
-
-          if (j >= 10) {
-            intersection = next_plattform.bbox.cutsRay(
-            this.positionX + Math.sign(this.velocityX) * this.width / 2,
-            this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
-            this.velocityX,
-            this.velocityY
-          );
-
-          /*line(this.screenX + Math.sign(this.velocityX) * this.width / 2,
-          this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
-          this.positionX + Math.sign(this.velocityX) * this.width / 2+this.velocityX,
-          this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2+this.velocityY)*/
-          
+                if (!nearest_collision || nearest_collision[0] > intersection[0]) {
+                    nearest_collision = intersection;
+                }
+            }
         }
 
-
-          if (!intersection || intersection[0] > 1) continue;
-
-          // Hier haben wir jetzt eine Intersection
-          // -> Uns interessiert nur die näheste Intersection
-          if (!nearest_collision || nearest_collision[0] > intersection[0]) {
-            nearest_collision = intersection;
-          }
-        }
-      }
-
-
-      if (nearest_collision) {
-        // Target Position updaten
-        if (nearest_collision[2] == "X"&& this.velocityX < 0) {
-          targetX = max(targetX, nearest_collision[1][0] + this.width / 2 + 0.01);
-        }
-        if (nearest_collision[2] == "X"&& this.velocityX > 0) {
-          targetX = min(targetX, nearest_collision[1][0] - this.width / 2 - 0.01);
+        if (nearest_collision) {
+            if (nearest_collision[2] === "X" && this.velocityX < 0) {
+                targetX = Math.max(targetX, nearest_collision[1][0] + this.width / 2 + 0.01);
+            }
+            if (nearest_collision[2] === "X" && this.velocityX > 0) {
+                targetX = Math.min(targetX, nearest_collision[1][0] - this.width / 2 - 0.01);
+            }
+            if (nearest_collision[2] === "Y" && this.velocityY < 0) {
+                targetY = Math.max(targetY, nearest_collision[1][1] + this.height / 2 + 0.01);
+            }
+            if (nearest_collision[2] === "Y" && this.velocityY > 0) {
+                targetY = Math.min(targetY, nearest_collision[1][1] - this.height / 2 - 0.01);
+            }
+            stopX = nearest_collision[2] === "X";
+            stopY = nearest_collision[2] === "Y";
         }
 
-        if (nearest_collision[2] == "Y"&& this.velocityY < 0) {
-          targetY = max(targetY, nearest_collision[1][1] + this.height / 2 + 0.01);
+        if (stopX) {
+            this.velocityX = 0;
+            this.positionX = targetX;
+        } else if (stopY) {
+            this.ground = true;
+            this.velocityY = 0;
+            this.positionY = targetY;
+        } else {
+            this.positionX = targetX;
+            this.positionY = targetY;
+            this.bbox.reposition(this.positionX, this.positionY);
+            break;
         }
-        if (nearest_collision[2] == "Y"&& this.velocityY > 0) {
-          targetY = min(targetY, nearest_collision[1][1] - this.height / 2 - 0.01);
-        }
-
-
-
-        // Note which direction should be stoped
-        stopX = nearest_collision[2] == "X";
-        stopY = nearest_collision[2] == "Y";
-      }
-
-      /*if(nearest_collision) {
-        circle(nearest_collision[1][0], nearest_collision[1][1],4)
-      }*/
-
-
-      if (stopX) {
-        this.velocityX = 0;
-        this.positionX = targetX;
-      }
-      else if (stopY) {
-        this.ground = true
-        this.velocityY = 0;
-        this.positionY = targetY;
-      }
-      else{
-        this.positionX = targetX;
-        this.positionY = targetY;
-
-        this.bbox.reposition(this.positionX, this.positionY)
-        break;
-      }
-
-
-      this.bbox.reposition(this.positionX, this.positionY)
+        this.bbox.reposition(this.positionX, this.positionY);
     }
 
-    var diffX = this.positionX - oldX
-    this.screenX += diffX
-    if(this.screenX >= 0.75 * windowWidth) {
-      this.screenX = 0.75 * windowWidth
+    const diffX = this.positionX - oldX;
+    this.screenX += diffX;
+    if (this.screenX >= 0.75 * window.innerWidth) {
+        this.screenX = 0.75 * window.innerWidth;
     }
-    if(this.screenX <= 0.25 * windowWidth) {
-      this.screenX = 0.25 * windowWidth
+    if (this.screenX <= 0.25 * window.innerWidth) {
+        this.screenX = 0.25 * window.innerWidth;
     }
   }
-
-  /*
-  update() {
-    this.velocityX += this.accelerationX - this.velocityX * air_resisstance;
-    this.velocityY += this.accelerationY + gravity;
-
-    let targetX = this.positionX + this.velocityX; 
-    let targetY = this.positionY + this.velocityY; 
-
-    let stopX = false;
-    let stopY = false;
-
-
-
-    for(let i=0; i < all_plattforms.length; i++){
-      let next_plattform = all_plattforms[i]
-      let nearest_collision = null
-
-
-      for(let j=0; j < 20; j++){
-        let intersection = next_plattform.bbox.cutsRay(
-          this.positionX+(1-2*Math.floor(j%2))*this.width/2,
-          this.positionY+(1-2*Math.floor(j/2))*this.height/2,
-          this.velocityX,
-          this.velocityY
-        );
-        
-        if(j > 3) intersection = next_plattform.bbox.cutsRay(
-          this.positionX+Math.sign(this.velocityX)*this.width/2,
-          this.positionY+(1-2*j/20)*this.height/2,
-          this.velocityX,
-          this.velocityY
-        );
-        
-
-        if(!intersection || intersection[0] > 1) continue;
-        
-        // Hier haben wir jetzt eine Intersection
-        // -> Uns interessiert nur die näheste Intersection
-        if(!nearest_collision || nearest_collision[0] > intersection[0]){
-          nearest_collision = intersection;
-        }
-      }
-
-
-      if(!nearest_collision) continue;
-
-      // Target Position updaten
-      if(nearest_collision[2] == "X" && this.velocityX < 0){
-        targetX = max(targetX, nearest_collision[1][0]+this.width/2+0.01);
-      } 
-      if(nearest_collision[2] == "X" && this.velocityX > 0){
-        targetX = min(targetX, nearest_collision[1][0]-this.width/2-0.01);
-      } 
-
-      if(nearest_collision[2] == "Y" && this.velocityY < 0){
-        targetY = max(targetY, nearest_collision[1][1]+this.height/2+0.01);
-      } 
-      if(nearest_collision[2] == "Y" && this.velocityY > 0){
-        targetY = min(targetY, nearest_collision[1][1]-this.height/2-0.01);
-      } 
-      
-
-
-      // Note which direction should be stoped
-      if(nearest_collision[2] == "X") stopX = true;
-      stopY ||= nearest_collision[2] == "Y";
-    }
-
-    this.positionX = targetX;
-    this.positionY = targetY;
-
-
-    if(stopX){
-      this.velocityX = 0;
-    } 
-
-    if(stopY){
-      this.velocityY = 0;
-    } 
-
-    this.bbox.reposition(this.positionX,this.positionY)
-
-
-  }
-  */
   draw() {
     rectMode(CENTER);
     fill("rgb(255, 94, 0)")
