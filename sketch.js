@@ -91,6 +91,10 @@ class Plattform {
     rect(this.positionX - diffX, this.positionY, this.width, this.height)
   }
 
+  resize(new_width, new_height) {  // Not final
+    this.width = new_width
+    this.height = new_height
+  }
 }
 class Player {
   // Wird beim Erstellen der Klasse aufgerufen
@@ -113,8 +117,6 @@ class Player {
 
     this.bbox = new BoundingBox(positionX, positionY, 50, 50)
   }
-
-  // Bewege dich nach rechts
 
   update() {
     var oldX = this.positionX
@@ -144,26 +146,14 @@ class Player {
             this.velocityY
           );
 
-          /*line(this.screenX + (1 - 2 * (j % 10) / 9) * this.width / 2,
-          this.positionY + Math.sign(this.velocityY) * this.height / 2,
-          this.positionX + (1 - 2 * (j % 10) / 9) * this.width / 2+this.velocityX,
-          this.positionY + Math.sign(this.velocityY) * this.height / 2+this.velocityY)*/
-
           if (j >= 10) {
             intersection = next_plattform.bbox.cutsRay(
             this.positionX + Math.sign(this.velocityX) * this.width / 2,
             this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
             this.velocityX,
             this.velocityY
-          );
-
-          /*line(this.screenX + Math.sign(this.velocityX) * this.width / 2,
-          this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
-          this.positionX + Math.sign(this.velocityX) * this.width / 2+this.velocityX,
-          this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2+this.velocityY)*/
-          
+          );            
         }
-
 
           if (!intersection || intersection[0] > 1) continue;
 
@@ -174,7 +164,6 @@ class Player {
           }
         }
       }
-
 
       if (nearest_collision) {
         // Target Position updaten
@@ -192,17 +181,10 @@ class Player {
           targetY = min(targetY, nearest_collision[1][1] - this.height / 2 - 0.01);
         }
 
-
-
         // Note which direction should be stoped
         stopX = nearest_collision[2] == "X";
         stopY = nearest_collision[2] == "Y";
       }
-
-      /*if(nearest_collision) {
-        circle(nearest_collision[1][0], nearest_collision[1][1],4)
-      }*/
-
 
       if (stopX) {
         this.velocityX = 0;
@@ -220,8 +202,7 @@ class Player {
         this.bbox.reposition(this.positionX, this.positionY)
         break;
       }
-
-
+      
       this.bbox.reposition(this.positionX, this.positionY)
     }
 
@@ -234,92 +215,7 @@ class Player {
       this.screenX = 0.25 * windowWidth
     }
   }
-
-  /*
-  update() {
-    this.velocityX += this.accelerationX - this.velocityX * air_resisstance;
-    this.velocityY += this.accelerationY + gravity;
-
-    let targetX = this.positionX + this.velocityX; 
-    let targetY = this.positionY + this.velocityY; 
-
-    let stopX = false;
-    let stopY = false;
-
-
-
-    for(let i=0; i < all_plattforms.length; i++){
-      let next_plattform = all_plattforms[i]
-      let nearest_collision = null
-
-
-      for(let j=0; j < 20; j++){
-        let intersection = next_plattform.bbox.cutsRay(
-          this.positionX+(1-2*Math.floor(j%2))*this.width/2,
-          this.positionY+(1-2*Math.floor(j/2))*this.height/2,
-          this.velocityX,
-          this.velocityY
-        );
-        
-        if(j > 3) intersection = next_plattform.bbox.cutsRay(
-          this.positionX+Math.sign(this.velocityX)*this.width/2,
-          this.positionY+(1-2*j/20)*this.height/2,
-          this.velocityX,
-          this.velocityY
-        );
-        
-
-        if(!intersection || intersection[0] > 1) continue;
-        
-        // Hier haben wir jetzt eine Intersection
-        // -> Uns interessiert nur die näheste Intersection
-        if(!nearest_collision || nearest_collision[0] > intersection[0]){
-          nearest_collision = intersection;
-        }
-      }
-
-
-      if(!nearest_collision) continue;
-
-      // Target Position updaten
-      if(nearest_collision[2] == "X" && this.velocityX < 0){
-        targetX = max(targetX, nearest_collision[1][0]+this.width/2+0.01);
-      } 
-      if(nearest_collision[2] == "X" && this.velocityX > 0){
-        targetX = min(targetX, nearest_collision[1][0]-this.width/2-0.01);
-      } 
-
-      if(nearest_collision[2] == "Y" && this.velocityY < 0){
-        targetY = max(targetY, nearest_collision[1][1]+this.height/2+0.01);
-      } 
-      if(nearest_collision[2] == "Y" && this.velocityY > 0){
-        targetY = min(targetY, nearest_collision[1][1]-this.height/2-0.01);
-      } 
-      
-
-
-      // Note which direction should be stoped
-      if(nearest_collision[2] == "X") stopX = true;
-      stopY ||= nearest_collision[2] == "Y";
-    }
-
-    this.positionX = targetX;
-    this.positionY = targetY;
-
-
-    if(stopX){
-      this.velocityX = 0;
-    } 
-
-    if(stopY){
-      this.velocityY = 0;
-    } 
-
-    this.bbox.reposition(this.positionX,this.positionY)
-
-
-  }
-  */
+  
   draw() {
     rectMode(CENTER);
     fill("rgb(255, 94, 0)")
@@ -328,7 +224,6 @@ class Player {
     square(this.screenX, this.positionY, 50)
     strokeWeight(1)  
   }
-
 }
 
 function keyPressed() {
@@ -338,7 +233,7 @@ function keyPressed() {
   if (keyCode == LEFT_ARROW) {
     player.accelerationX = -1
   }
-  if (keyCode == UP_ARROW && player.ground) {
+  if ((keyCode == UP_ARROW || keyCode == 32) && player.ground) {
     player.velocityY = -10
     player.positionY -= 0.001
     jump1sound.stop()
@@ -424,12 +319,6 @@ function drawBackground() {
   }
   strokeWeight(1)
 
-  // Dirt/Floor
-  /*fill("brown")
-  stroke("brown")
-  rectMode(CORNER)
-  rect(0, 0.925 * windowHeight, windowWidth, 0.075 * windowHeight)*/
-
   // Clouds
   fill("white")
   stroke("white")
@@ -446,21 +335,14 @@ function drawBackground() {
     circle(windowWidth / 1.5 * (c+0.05) - diffX / 10 + noise(3*c) + movingClouds / 5, 0.15 * windowWidth + noise(12*c), 0.25 * windowHeight + noise(4*c))
     circle(windowWidth / 1.5 * (c+0.1) - diffX / 10 + noise(5*c) + movingClouds / 5, 0.1 * windowWidth + noise(13*c), 0.25 * windowHeight + noise(6*c))
   }
-   
-
 }
-
 
 function draw() {
-  //background("grey");
-  drawBackground()
-  player.draw()
-  for (let i = 0; i < all_plattforms.length; i++) {
-    const element = all_plattforms[i];
-    element.draw()
-  }
-
-  player.update()
-
+    drawBackground();
+    player.draw();
+    for (let i = 0; i < all_plattforms.length; i++) {
+        const element = all_plattforms[i];
+        element.draw();
+    }
+    player.update();
 }
-
