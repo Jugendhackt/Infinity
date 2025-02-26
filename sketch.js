@@ -118,8 +118,6 @@ class Player {
     this.bbox = new BoundingBox(positionX, positionY, 50, 50)
   }
 
-  // Bewege dich nach rechts
-
   update() {
     var oldX = this.positionX
 
@@ -154,8 +152,7 @@ class Player {
             this.positionY + (1 - 2 * (j % 10) / 9) * this.height / 2,
             this.velocityX,
             this.velocityY
-          );
-            
+          );            
         }
 
           if (!intersection || intersection[0] > 1) continue;
@@ -205,8 +202,7 @@ class Player {
         this.bbox.reposition(this.positionX, this.positionY)
         break;
       }
-
-
+      
       this.bbox.reposition(this.positionX, this.positionY)
     }
 
@@ -228,24 +224,6 @@ class Player {
     square(this.screenX, this.positionY, 50)
     strokeWeight(1)  
   }
-}
-
-var firstExtend = true;
-
-function extendGround() {
-    if (firstExtend) {
-        console.log("Using the first platform");
-        firstExtend = false;
-        // Modify this part to use the first platform as needed
-        // For example:
-        let newPlattform = all_plattforms[0];
-        all_plattforms.push(newPlattform);
-    } else {
-        let lastPlattform = all_plattforms[all_plattforms.length - 1];
-        let newX = lastPlattform.positionX + lastPlattform.width;
-        let newPlattform = new Plattform(newX, window.innerHeight - 40, 2000, 90, "blue");
-        all_plattforms.push(newPlattform);
-    }
 }
 
 function keyPressed() {
@@ -367,10 +345,4 @@ function draw() {
         element.draw();
     }
     player.update();
-
-    // Überprüfen, ob der Spieler in der Nähe des Endes des Bodens ist
-    let lastPlattform = all_plattforms[all_plattforms.length - 1];
-    if (player.positionX + player.width / 2 > lastPlattform.positionX + lastPlattform.width - 100) {
-      extendGround();
-    }
 }
